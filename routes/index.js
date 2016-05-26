@@ -7,7 +7,7 @@ var content = require('../content')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-	res.render('index', { title: 'IVP' });
+	res.render('index', { title: 'Suspibook' });
 });
 
 router.post('/', function(req, res, next) {
