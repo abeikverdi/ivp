@@ -12,7 +12,7 @@ $(document).ready(function(){
 			contentType: 'application/json',
 			success: function(data){
 				$("#loader").addClass('hidden')
-				if(data.success === true){
+				if(data.isAdult === false){
 					Materialize.toast('Website does not contain adult content', 10000)
 				} else {
 					Materialize.toast('Website contains adult content', 10000, 'red')

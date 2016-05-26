@@ -7,7 +7,7 @@ var content = require('../content')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'IVP' });
+	res.render('index', { title: 'IVP' });
 });
 
 router.post('/', function(req, res, next) {
@@ -15,12 +15,27 @@ router.post('/', function(req, res, next) {
 	axios.get(url)
 		.then(function(response) {
 			// imageProcessing();
+
 			var c = new content();
 			c.data = cheerio.load(response.data);
-			console.log(c.isAdult());
+			var isAdult;
+			var isAdultPromise = new Promise(function(resolve, reject) {
+				isAdult = c.isAdult();
+				resolve(true)
+			});
+
+			isAdultPromise.then(function(result) {
+			 	console.log("Count: " + c.wordCount);
+			 	console.log("relativeLinks: " + c.relativeLinks);
+				console.log("absoluteLinks: " + c.absoluteLinks);
+				// imageProcessing();
+			}, function(err) {
+			 	console.log(err);
+			});
+
 			res.json({
 				data: response.data,
-				success: true
+				isAdult: isAdult
 			});
 		})
 		.catch(function(response) {
@@ -52,11 +67,11 @@ function imageProcessing() {
 }
 
 function findStringInHTMLBody($, stringToFind) {
-  var strBody = $('html > body').text();
-  if(strBody.toLowerCase().indexOf(stringToFind.toLowerCase()) !== -1) {
-    return true;
-  }
-  return false;
+	var strBody = $('html > body').text();
+	if(strBody.toLowerCase().indexOf(stringToFind.toLowerCase()) !== -1) {
+		return true;
+  	}
+	return false;
 }
 
 module.exports = router;

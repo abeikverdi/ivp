@@ -1,7 +1,8 @@
 var content = function Content() {
 	this.data = "";
-	this.objectionableWord = ['watch'];
+	this.objectionableWord = require('./objectionableWordsDB.json').words;
 	this.score = 0;
+	this.wordCount = 0;
 	this.absoluteLinks = [];
 	this.relativeLinks = [];
 }
@@ -9,7 +10,6 @@ var content = function Content() {
 content.prototype.isAdult = function() {
 	if(this.findObjectionableWord() == true){
 		this.getSuspiciousContentLinks();
-		console.log(this.relativeLinks);
 	} else {
 		return false;
 	}
@@ -18,10 +18,11 @@ content.prototype.isAdult = function() {
 content.prototype.findObjectionableWord = function() {
 	var hasSuspiciousContent = false;
 	var strBody = this.data('html > body').text();
+	var that = this;
 	this.objectionableWord.forEach(function(o){
 		if(strBody.toLowerCase().indexOf(o.toLowerCase()) !== -1) {
+			that.wordCount++;
 			hasSuspiciousContent = true;
-			return false;
 		}
 	});
 	return hasSuspiciousContent;
@@ -32,15 +33,13 @@ content.prototype.getSuspiciousContentLinks = function() {
 	console.log("unsafe");
 	var that = this;
 
-	var link = this.data("a[href^='/']");
-	this.relativeLinks = link.map(function(o) {
-		return that.data(this).attr('href');
-	});
-
-	link = this.data("a[href^='/']");
-	this.absoluteLinks = link.map(function(o) {
-		return that.data(this).attr('href');
-	});
+	for(var i=0; i<this.data("img").length; i++){
+		if(this.data("img")[i].attribs.src.substring(0,1) == '/'){
+			this.relativeLinks.push(this.data("img")[i].attribs.src);
+		} else {
+			this.absoluteLinks.push(this.data("img")[i].attribs.src);
+		}
+	}
 }
 
 module.exports = content
