@@ -2,6 +2,7 @@ var content = function Content() {
 	this.data = "";
 	this.objectionableWord = require('./objectionableWordsDB.json').words;
 	this.score = 0;
+	this.level = 0; //level of how suspicous we are about the content
 	this.wordCount = 0;
 	this.absoluteLinks = [];
 	this.relativeLinks = [];
@@ -9,6 +10,7 @@ var content = function Content() {
 
 content.prototype.isAdult = function() {
 	if(this.findObjectionableWord() == true){
+		this.level++;
 		this.getSuspiciousContentLinks();
 	} else {
 		return false;
@@ -30,14 +32,14 @@ content.prototype.findObjectionableWord = function() {
 
 
 content.prototype.getSuspiciousContentLinks = function() {
-	console.log("unsafe");
 	var that = this;
-
 	for(var i=0; i<this.data("img").length; i++){
-		if(this.data("img")[i].attribs.src.substring(0,1) == '/'){
-			this.relativeLinks.push(this.data("img")[i].attribs.src);
-		} else {
-			this.absoluteLinks.push(this.data("img")[i].attribs.src);
+		if(this.data("img")[i].attribs.src != undefined) {
+			if(this.data("img")[i].attribs.src.substring(0,1) == '/'){
+				this.relativeLinks.push(this.data("img")[i].attribs.src);
+			} else {
+				this.absoluteLinks.push(this.data("img")[i].attribs.src);
+			}
 		}
 	}
 }
